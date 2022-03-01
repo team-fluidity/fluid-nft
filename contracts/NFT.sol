@@ -33,15 +33,19 @@ contract Web3ConNFT is ERC721, SuperAppBase {
   address public _receiver;
 
   string public baseExtension = ".json";
-  
+  //create a mapping of flow rates:
+  mapping (uint256 => int96) public flowRates;
+  uint256 public nextId; // this is so we can increment the number (each stream has new id we store in flowRates)
+
+
   constructor (
     address owner,
     string memory _name,
     string memory _symbol,
     ISuperfluid host,
     IConstantFlowAgreementV1 cfa,
-    ISuperToken acceptedToken,
-    address receiver
+    ISuperToken acceptedToken
+    //address receiver
   )
     ERC721 ( _name, _symbol )
       {
@@ -49,13 +53,13 @@ contract Web3ConNFT is ERC721, SuperAppBase {
       assert(address(host) != address(0));
       assert(address(cfa) != address(0));
       assert(address(acceptedToken) != address(0));
-      assert(address(receiver) != address(0));
+      //assert(address(receiver) != address(0));
       //assert(!_host.isApp(ISuperApp(receiver)));
 
       _host = host;
       _cfa = cfa;
       _acceptedToken = acceptedToken;
-      _receiver = receiver;
+      _receiver = msg.sender;
 
       uint256 configWord =
             SuperAppDefinitions.APP_LEVEL_FINAL |
@@ -66,10 +70,18 @@ contract Web3ConNFT is ERC721, SuperAppBase {
 
       _host.registerApp(configWord);
 
-      _mint(owner, 1);
-      _setBaseURI("ipfs://QmR3nK6suuKmsgDZDraYF5JCJNUND3JHYgnYJXzGUohL9L/1.json");
+        nextId = 1;
+      //_mint(owner, 1);
+      //_setBaseURI("ipfs://QmR3nK6suuKmsgDZDraYF5JCJNUND3JHYgnYJXzGUohL9L/1.json");
   }
 ///////////////// Redirect All Code /////////////////////////////
+
+    function mintNFT() public {  //should make payable
+        _mint(msg.sender, nextId);
+        _receiver = msg.sender;
+        nextId += 1;
+        _setBaseURI("ipfs://QmR3nK6suuKmsgDZDraYF5JCJNUND3JHYgnYJXzGUohL9L/1.json");
+    }
 
     /**************************************************************************
      * Redirect Logic

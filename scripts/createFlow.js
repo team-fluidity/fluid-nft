@@ -17,7 +17,7 @@ const tradeableCashflowABI = tradeableCashflowJSON.abi;
 //temporarily hardcode contract address and sender address
 //need to manually enter contract address and sender address here
 const deployedTradeableCashflow = require("../artifacts/contracts/NFT.sol/Web3ConNFT.json");
-const tradeableCashflowAddress = "0xDd229555c47cdBC1ba9D6c9560d635F65213B18f"; //hardcoded address
+const tradeableCashflowAddress = "0x810cf9524C9036dde8911b1EA25f1Ce548fcf50B"; //hardcoded address
 //your address here:
 const _sender = "0xe2b8651bF50913057fF47FC4f02A8e12146083B8";
 
