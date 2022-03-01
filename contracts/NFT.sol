@@ -77,6 +77,7 @@ contract Web3ConNFT is ERC721, SuperAppBase {
 ///////////////// Redirect All Code /////////////////////////////
 
     function mintNFT() public {  //should make payable
+        require(nextId < 2, "too many tokens minted");
         _mint(msg.sender, nextId);
         _receiver = msg.sender;
         nextId += 1;
