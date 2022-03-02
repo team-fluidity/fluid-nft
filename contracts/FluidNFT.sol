@@ -110,9 +110,9 @@ contract Web3FluidNFT is ERC721, SuperAppBase {
         int96 inFlowRate = netFlowRate + outFlowRate;
 
         //look into this
-        /*if (inFlowRate < 0 ) {
+        if (inFlowRate < 0 ) {
           inFlowRate = inFlowRate * -1; // Fixes issue when inFlowRate is negative
-      } */
+        } 
 
         // @dev If inFlowRate === 0, then delete existing flow.
         if (inFlowRate == int96(0)) {
