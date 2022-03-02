@@ -66,7 +66,7 @@ contract Web3FluidNFT is ERC721, SuperAppBase {
       _host.registerApp(configWord);
 
       _mint(owner, 1);
-      //_setBaseURI("ipfs://QmR3nK6suuKmsgDZDraYF5JCJNUND3JHYgnYJXzGUohL9L/1.json");
+      _setBaseURI("ipfs://QmR3nK6suuKmsgDZDraYF5JCJNUND3JHYgnYJXzGUohL9L/1.json");
   }
 
     /**************************************************************************
@@ -92,7 +92,7 @@ contract Web3FluidNFT is ERC721, SuperAppBase {
         }
     }
 
-    event ReceiverChanged(address receiver); //what is this?
+    event ReceiverChanged(address receiver); 
 
     /// @dev If a new stream is opened, or an existing one is opened
     function _updateOutflow(bytes calldata ctx)
@@ -108,6 +108,11 @@ contract Web3FluidNFT is ERC721, SuperAppBase {
             _receiver
         ); // CHECK: unclear what happens if flow doesn't exist.
         int96 inFlowRate = netFlowRate + outFlowRate;
+
+        //look into this
+        /*if (inFlowRate < 0 ) {
+          inFlowRate = inFlowRate * -1; // Fixes issue when inFlowRate is negative
+      } */
 
         // @dev If inFlowRate === 0, then delete existing flow.
         if (inFlowRate == int96(0)) {
@@ -218,6 +223,7 @@ contract Web3FluidNFT is ERC721, SuperAppBase {
         onlyHost
         returns (bytes memory newCtx)
     {
+        _setBaseURI("ipfs://QmbawgkzWeUvKvUs7uac9j2n6FXQn4wQeg8athaEdifgZQ/1.json");
         return _updateOutflow(_ctx);
     }
 
@@ -249,6 +255,8 @@ contract Web3FluidNFT is ERC721, SuperAppBase {
         // According to the app basic law, we should never revert in a termination callback
         if (!_isSameToken(_superToken) || !_isCFAv1(_agreementClass))
             return _ctx;
+            //set token back to non streaming
+            _setBaseURI("ipfs://QmR3nK6suuKmsgDZDraYF5JCJNUND3JHYgnYJXzGUohL9L/1.json");
         return _updateOutflow(_ctx);
     }
 
@@ -278,6 +286,30 @@ contract Web3FluidNFT is ERC721, SuperAppBase {
         _;
     }
 
+    // modifier to stock anybody calling the URI functions Ownable not used
+    modifier onlyTheOwner() {
+        require(msg.sender == ownerOf(1), "Not the owner of Token");
+        _;
+    }
+
+    //add in ERC721 functions
+     //no modifiers to secure this yet - anybody can call
+    function changeURI(string memory _tokenURI) public onlyTheOwner {
+        _setBaseURI(_tokenURI);
+    }
+
+    function destroyNFT(uint256 _tokenId) public onlyTheOwner {
+        _burn(_tokenId);
+    }
+
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+    require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+
+    string memory currentBaseURI = baseURI();
+    return bytes(currentBaseURI).length > 0
+        ? string(abi.encodePacked(currentBaseURI))
+        : "";
+    }
 
     //now I will insert a nice little hook in the _transfer, including the RedirectAll function I need
   function _beforeTokenTransfer(
